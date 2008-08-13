@@ -26,6 +26,7 @@ struct object {
     } data;
 };
 
+#define NIL 0
 #define T_SYMBOL    0x01
 #define T_CHARACTER 0x02
 #define T_NUMBER    0x03

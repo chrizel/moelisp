@@ -6,7 +6,7 @@ pobject object_new(char type)
 {
     pobject o = malloc(sizeof(struct object));
     o->flags = type;
-    return 0;
+    return o;
 }
 
 void object_free(pobject o)
