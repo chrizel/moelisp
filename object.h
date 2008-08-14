@@ -34,11 +34,16 @@ struct object {
 #define T_CONS      0x05
 
 static inline int is_nil(pobject o) { return !o; }
-static inline int is_symbol(pobject o) { return o && o->flags & T_SYMBOL; }
-static inline int is_character(pobject o) { return o && o->flags & T_CHARACTER; }
-static inline int is_number(pobject o) { return o && o->flags & T_NUMBER; }
-static inline int is_func(pobject o) { return o && o->flags & T_FUNC; }
-static inline int is_cons(pobject o) { return o && o->flags & T_CONS; }
+static inline int is_symbol(pobject o) 
+    { return o && (o->flags & 0x0f) == T_SYMBOL; }
+static inline int is_character(pobject o) 
+    { return o && (o->flags & 0x0f) == T_CHARACTER; }
+static inline int is_number(pobject o) 
+    { return o && (o->flags & 0x0f) == T_NUMBER; }
+static inline int is_func(pobject o) 
+    { return o && (o->flags & 0x0f) == T_FUNC; }
+static inline int is_cons(pobject o) 
+    { return o && (o->flags & 0x0f) == T_CONS; }
 
 extern pobject object_new(char type);
 extern void object_free(pobject o);

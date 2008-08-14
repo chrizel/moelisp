@@ -3,6 +3,7 @@
 #include "cons.h"
 #include "number.h"
 #include "object.h"
+#include "print.h"
 #include "read.h"
 #include "symbol.h"
 
@@ -12,7 +13,6 @@ int main(int argc, char *argv[])
     pobject list;
     pobject nums[6];
 
-/*
     for (i = 0; i < 6; i++)
         nums[i] = number_new(i + 1);
 
@@ -23,10 +23,26 @@ int main(int argc, char *argv[])
                cons_new(nums[4],
                 cons_new(nums[5], NIL))))));
 
-    printf("%f\n", number_value(cons_assoc_lookup(list, nums[2])));
-*/
-
     read("(+ hello world test)");
+
+    print(list);
+    printf("\n\n");
+
+    cons_list_append(&list, symbol_new("foo"));
+    cons_list_append(&list, symbol_new("bar"));
+    print(list);
+
+    /*
+    print(cons_new(symbol_new("+"),
+                cons_new(number_new(1),
+                    cons_new(
+                        cons_new(symbol_new("*"),
+                            cons_new(number_new(2),
+                                cons_new(number_new(3),
+                                    NIL))), NIL))));
+                                    */
+
+    printf("\n\n");
         
     return 0;
 }

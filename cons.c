@@ -22,3 +22,15 @@ pobject cons_assoc_lookup(pobject list, pobject key)
     return NIL;
 }
 
+void cons_list_append(pobject *list, pobject o)
+{
+    pobject cur = *list;
+    if (is_cons(cur)) {
+        while (is_cons(cons_cdr(cur)))
+            cur = cons_cdr(cur);
+        cons_cdr_set(cur, cons_new(o, NIL));
+    } else if (is_nil(cur)) {
+        *list = cons_new(o, NIL);
+    }
+}
+

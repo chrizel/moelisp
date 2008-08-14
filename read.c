@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "cons.h"
 #include "object.h"
 #include "read.h"
 #include "symbol.h"
@@ -67,10 +68,31 @@ static int next_token(char *code, int *start, int *end)
     }
 }
 
-pobject read(char *code)
+static int internal_read(char *code, pobject *dest, int *start, int *end)
 {
-    pobject o;
-    int start = 0, end = 0, type;
+    pobject tmp;
+    int type;
+    type = next_token(code, &start, &end);
+    switch (type) {
+    case TK_SYMBOL:
+        *dest = symbol_create_by_slice(code, *start, *end);
+        break;
+    case TK_PAREN_OPEN:
+        *dest = cons_new(NIL, NIL);
+        *start = *end;
+        while (type = internal_read(code, &cons_car(*dest), start, end)) {
+            if (type == TK_PAREN_CLOSE)
+                break;
+            *start = *end;
+
+        }
+        break;
+    }
+
+    *start = *end;
+    return type;
+
+    /*
     while (type = next_token(code, &start, &end)) {
         if (type == TK_SYMBOL) {
             o = symbol_new_by_slice(code, start, end);
@@ -81,4 +103,13 @@ pobject read(char *code)
         }
         start = end;
     }
+    */
+}
+
+pobject read(char *code)
+{
+    pobject result;
+    int start = 0, int end = 0;
+    internal_read(code, &result, &start, &end);
+    return result;
 }
