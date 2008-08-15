@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "cons.h"
+#include "number.h"
 #include "object.h"
 #include "read.h"
 #include "symbol.h"
@@ -46,6 +47,7 @@ static int next_token(char *code, int *start, int *end)
 {
     int c;
 
+    *start = *end;
     while (code[*start] && (skip_spaces(code, start) || skip_comments(code, start)))
         ;
 
@@ -68,48 +70,35 @@ static int next_token(char *code, int *start, int *end)
     }
 }
 
-static int internal_read(char *code, pobject *dest, int *start, int *end)
-{
-    pobject tmp;
-    int type;
-    type = next_token(code, &start, &end);
-    switch (type) {
-    case TK_SYMBOL:
-        *dest = symbol_create_by_slice(code, *start, *end);
-        break;
-    case TK_PAREN_OPEN:
-        *dest = cons_new(NIL, NIL);
-        *start = *end;
-        while (type = internal_read(code, &cons_car(*dest), start, end)) {
-            if (type == TK_PAREN_CLOSE)
-                break;
-            *start = *end;
-
-        }
-        break;
-    }
-
-    *start = *end;
-    return type;
-
-    /*
-    while (type = next_token(code, &start, &end)) {
-        if (type == TK_SYMBOL) {
-            o = symbol_new_by_slice(code, start, end);
-            printf("symbol: \"%s\"\n", symbol_value(o));
-            object_free(o);
-        } else {
-            printf("%d: %d-%d\n", type, start, end - 1);
-        }
-        start = end;
-    }
-    */
+#define moe_read_stack_macro(stack, object) { \
+    pobject tmp = (object); \
+    if (is_nil(stack)) \
+        return tmp; \
+    else \
+        cons_list_append( &(stack->data.cons.car), tmp ); \
 }
 
 pobject read(char *code)
 {
-    pobject result;
-    int start = 0, int end = 0;
-    internal_read(code, &result, &start, &end);
-    return result;
+    int type, start, end = 0;
+    pobject stack = NIL;
+
+    while ((type = next_token(code, &start, &end))) {
+        switch (type) {
+        case TK_SYMBOL:
+            moe_read_stack_macro(stack, symbol_new_by_slice(code, start, end));
+            break;
+        case TK_NUMBER:
+            moe_read_stack_macro(stack, number_new_by_slice(code, start, end));
+            break;
+        case TK_PAREN_OPEN:
+            cons_stack_push(&stack, NIL);
+            break;
+        case TK_PAREN_CLOSE:
+            moe_read_stack_macro(stack, cons_stack_pop(&stack));
+            break;
+        }
+    }; 
+
+    return is_nil(stack) ? NIL : cons_car(cons_list_last(stack));
 }

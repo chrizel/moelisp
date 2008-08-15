@@ -36,3 +36,10 @@ void print(pobject o)
         printf(")");
     }
 }
+
+void println(pobject o)
+{
+    print(o);
+    printf("\n");
+}
+

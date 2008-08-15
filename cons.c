@@ -34,3 +34,32 @@ void cons_list_append(pobject *list, pobject o)
     }
 }
 
+pobject cons_list_last(pobject list)
+{
+    if (is_cons(list)) {
+        while (is_cons(cons_cdr(list)))
+            list = cons_cdr(list);
+        return list;
+    }
+
+    return NIL;
+}
+
+void cons_stack_push(pobject *stack, pobject o)
+{
+    *stack = cons_new(o, *stack);
+}
+
+pobject cons_stack_pop(pobject *stack)
+{
+    if (is_cons(*stack)) {
+        pobject result = cons_car(*stack);
+        pobject cons = *stack;
+        *stack = cons_cdr(cons);
+        object_free(cons);
+        return result;
+    }
+
+    return NIL;
+}
+
