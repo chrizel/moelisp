@@ -1,21 +1,58 @@
 #include <stdio.h>
 
 #include "cons.h"
+#include "eval.h"
 #include "number.h"
 #include "object.h"
 #include "print.h"
 #include "read.h"
 #include "symbol.h"
 
+static pobject plus(pobject params)
+{
+    float result = 0;
+    while (is_cons(params)) {
+        pobject o = cons_car(params);
+        if (is_number(o))
+            result += number_value(o);
+        params = cons_cdr(params);
+    }
+
+    return number_new(result);
+}
+
+static pobject mult(pobject params)
+{
+    float result = 1;
+    while (is_cons(params)) {
+        pobject o = cons_car(params);
+        if (is_number(o))
+            result *= number_value(o);
+        params = cons_cdr(params);
+    }
+
+    return number_new(result);
+}
+
 int main(int argc, char *argv[])
 {
-    pobject o1 = symbol_intern("foo");
-    pobject o2 = symbol_intern("bar");
-    pobject o3 = symbol_intern("foo");
+    pobject env = NIL;
+    pobject p;
 
-    printf("o1: %p\n", o1);
-    printf("o2: %p\n", o2);
-    printf("o3: %p\n", o3);
+    p = object_new(T_FUNC);
+    p->data.func = plus;
+    cons_assoc_set(&env, symbol_intern("+"), p);
 
+    p = object_new(T_FUNC);
+    p->data.func = mult;
+    cons_assoc_set(&env, symbol_intern("*"), p);
+
+    cons_assoc_set(&env, symbol_intern("foo"), number_new(42));
+    cons_assoc_set(&env, symbol_intern("bar"), number_new(3.14));
+    cons_assoc_set(&env, symbol_intern("baz"), number_new(100));
+
+    if (argc > 1)
+        println(eval(env, read(argv[1])));
+    
     return 0;
 }

@@ -9,10 +9,27 @@ pobject cons_new(pobject car, pobject cdr)
     return o;
 }
 
+void cons_assoc_set(pobject *list, pobject key, pobject value)
+{
+    if (is_cons(*list)) {
+        pobject cur = *list;
+        while (cur && is_cons(cons_cdr(cur))) {
+            if (cons_car(cur) == key) {
+                /* XXX: Memory management??? */
+                cons_car_set(cons_cdr(cur), value);
+                return;
+            }
+            cur = cons_cdr(cons_cdr(cur));
+        }
+    }
+
+    *list = cons_new(key, cons_new(value, *list));
+}
+
 pobject cons_assoc_lookup(pobject list, pobject key)
 {
     if (is_cons(list)) {
-        while (is_cons(cons_cdr(list))) {
+        while (list && is_cons(cons_cdr(list))) {
             if (cons_car(list) == key)
                 return cons_car(cons_cdr(list));
             list = cons_cdr(cons_cdr(list));

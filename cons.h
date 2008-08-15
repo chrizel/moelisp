@@ -5,6 +5,7 @@
 
 extern pobject cons_new(pobject car, pobject cdr);
 
+extern void cons_assoc_set(pobject *list, pobject key, pobject value);
 extern pobject cons_assoc_lookup(pobject list, pobject key);
 
 extern void cons_list_append(pobject *list, pobject o);
