@@ -86,7 +86,7 @@ pobject read(char *code)
     while ((type = next_token(code, &start, &end))) {
         switch (type) {
         case TK_SYMBOL:
-            moe_read_stack_macro(stack, symbol_new_by_slice(code, start, end));
+            moe_read_stack_macro(stack, symbol_intern_by_slice(code, start, end));
             break;
         case TK_NUMBER:
             moe_read_stack_macro(stack, number_new_by_slice(code, start, end));
