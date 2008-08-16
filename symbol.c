@@ -38,7 +38,7 @@ pobject symbol_intern_by_slice(char *value, int start, int end)
             }
         }
 
-        if (result)
+        if (result && (str[i] == '\0'))
             return result;
 
         cur = cons_cdr(cur);
