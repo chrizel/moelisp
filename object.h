@@ -33,19 +33,25 @@ struct object {
 #define T_CFUNC     0x04
 #define T_CONS      0x05
 
+static inline int object_type(pobject o)
+    { return o ? (o->flags & 0x0f) : NIL; }
 static inline int is_nil(pobject o) { return !o; }
+
 static inline int is_symbol(pobject o) 
-    { return o && (o->flags & 0x0f) == T_SYMBOL; }
+    { return object_type(o) == T_SYMBOL; }
 static inline int is_character(pobject o) 
-    { return o && (o->flags & 0x0f) == T_CHARACTER; }
+    { return object_type(o) == T_CHARACTER; }
 static inline int is_number(pobject o) 
-    { return o && (o->flags & 0x0f) == T_NUMBER; }
+    { return object_type(o) == T_NUMBER; }
 static inline int is_cfunc(pobject o) 
-    { return o && (o->flags & 0x0f) == T_CFUNC; }
+    { return object_type(o) == T_CFUNC; }
 static inline int is_cons(pobject o) 
-    { return o && (o->flags & 0x0f) == T_CONS; }
+    { return object_type(o) == T_CONS; }
 
 extern pobject object_new(char type);
 extern void object_free(pobject o);
+extern int object_equal(pobject o1, pobject o2);
+
+pobject object_true;
 
 #endif
