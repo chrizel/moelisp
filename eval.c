@@ -7,15 +7,8 @@ pobject eval(pobject env, pobject code)
 {
     if (is_cons(code)) {
         pobject proc = eval(env, cons_car(code));
-        if (is_cfunc(proc)) {
-            pobject tmp = cons_cdr(code);
-            pobject params = NIL;
-            while (tmp) {
-                cons_list_append(&params, eval(env, cons_car(tmp)));
-                tmp = cons_cdr(tmp);
-            }
-            return proc->data.cfunc(env, params);
-        }
+        if (is_cfunc(proc))
+            return proc->data.cfunc(env, cons_cdr(code));
     } else if (is_symbol(code)) {
         return cons_assoc_lookup(env, code);
     } else {

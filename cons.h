@@ -14,8 +14,8 @@ extern pobject cons_list_last(pobject list);
 extern void cons_stack_push(pobject *stack, pobject o);
 extern pobject cons_stack_pop(pobject *stack);
 
-static inline pobject cons_car(pobject o) { return o->data.cons.car; }
-static inline pobject cons_cdr(pobject o) { return o->data.cons.cdr; }
+static inline pobject cons_car(pobject o) { return is_nil(o) ? NIL : o->data.cons.car; }
+static inline pobject cons_cdr(pobject o) { return is_nil(o) ? NIL : o->data.cons.cdr; }
 static inline void cons_car_set(pobject o, pobject car) { o->data.cons.car = car; }
 static inline void cons_cdr_set(pobject o, pobject cdr) { o->data.cons.cdr = cdr; }
 
