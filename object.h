@@ -4,7 +4,7 @@
 struct object;
 typedef struct object * pobject;
 
-typedef pobject (*cfunc)(pobject params);
+typedef pobject (*pcfunc)(pobject env, pobject params);
 
 /*
  * flags: 0000|0000
@@ -18,7 +18,7 @@ struct object {
         char *symbol;
         int character;
         double number;
-        cfunc func;
+        pcfunc cfunc;
         struct {
             pobject car;
             pobject cdr;
@@ -30,7 +30,7 @@ struct object {
 #define T_SYMBOL    0x01
 #define T_CHARACTER 0x02
 #define T_NUMBER    0x03
-#define T_FUNC      0x04
+#define T_CFUNC     0x04
 #define T_CONS      0x05
 
 static inline int is_nil(pobject o) { return !o; }
@@ -40,8 +40,8 @@ static inline int is_character(pobject o)
     { return o && (o->flags & 0x0f) == T_CHARACTER; }
 static inline int is_number(pobject o) 
     { return o && (o->flags & 0x0f) == T_NUMBER; }
-static inline int is_func(pobject o) 
-    { return o && (o->flags & 0x0f) == T_FUNC; }
+static inline int is_cfunc(pobject o) 
+    { return o && (o->flags & 0x0f) == T_CFUNC; }
 static inline int is_cons(pobject o) 
     { return o && (o->flags & 0x0f) == T_CONS; }
 

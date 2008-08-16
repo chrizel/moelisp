@@ -17,8 +17,8 @@ void print(pobject o)
         printf("#\\%c", character_value(o));
     else if (is_number(o))
         printf("%f", number_value(o));
-    else if (is_func(o))
-        printf("#<func:%p>", o->data.func);
+    else if (is_cfunc(o))
+        printf("#<cfunc:%p>", o->data.cfunc);
     else if (is_cons(o)) {
         printf("(");
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "cfunc.h"
 #include "cons.h"
 #include "eval.h"
 #include "number.h"
@@ -8,7 +9,13 @@
 #include "read.h"
 #include "symbol.h"
 
-static pobject plus(pobject params)
+static pobject do_something(pobject env, pobject params)
+{
+    static char ptypes[] = {T_NUMBER, T_NUMBER};
+    return 0;
+}
+
+static pobject plus(pobject env, pobject params)
 {
     float result = 0;
     while (is_cons(params)) {
@@ -21,7 +28,7 @@ static pobject plus(pobject params)
     return number_new(result);
 }
 
-static pobject mult(pobject params)
+static pobject mult(pobject env, pobject params)
 {
     float result = 1;
     while (is_cons(params)) {
@@ -37,15 +44,9 @@ static pobject mult(pobject params)
 int main(int argc, char *argv[])
 {
     pobject env = NIL;
-    pobject p;
 
-    p = object_new(T_FUNC);
-    p->data.func = plus;
-    cons_assoc_set(&env, symbol_intern("+"), p);
-
-    p = object_new(T_FUNC);
-    p->data.func = mult;
-    cons_assoc_set(&env, symbol_intern("*"), p);
+    cons_assoc_set(&env, symbol_intern("+"), cfunc_new(plus));
+    cons_assoc_set(&env, symbol_intern("*"), cfunc_new(mult));
 
     cons_assoc_set(&env, symbol_intern("foo"), number_new(42));
     cons_assoc_set(&env, symbol_intern("bar"), number_new(3.14));
