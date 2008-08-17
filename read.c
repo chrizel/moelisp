@@ -12,6 +12,7 @@
 #define TK_PAREN_CLOSE   2
 #define TK_SYMBOL        3
 #define TK_NUMBER        4
+#define TK_DOT           5
 
 static inline int is_symbol_char(int c)
 {
@@ -27,6 +28,7 @@ static inline int is_symbol_char(int c)
         || (c == '#')
         || (c == '=')
         || (c == '!')
+        || (c == '.')
         || (c == '>')
         || (c == '<');
 }
@@ -62,6 +64,8 @@ static int next_token(char *code, int *start, int *end)
         return TK_PAREN_OPEN;
     else if (c == ')')
         return TK_PAREN_CLOSE;
+    else if (c == '.')
+        return TK_DOT;
     else if (c >= '0' && c <= '9') {
         while (code[*end] && ((code[*end] >= '0' && code[*end] <= '9') || (code[*end] == '.')))
             ++(*end);
@@ -79,13 +83,17 @@ static int next_token(char *code, int *start, int *end)
     pobject tmp = (object); \
     if (is_nil(stack)) \
         return tmp; \
-    else \
+    else if (dot_next) { \
+        cons_list_last_cdr_set( &(stack->data.cons.car), tmp); \
+        dot_next = 0; \
+    } else { \
         cons_list_append( &(stack->data.cons.car), tmp ); \
+    } \
 }
 
 pobject read(char *code)
 {
-    int type, start, end = 0;
+    int type, start, end = 0, dot_next = 0;
     pobject stack = NIL;
 
     while ((type = next_token(code, &start, &end))) {
@@ -101,6 +109,9 @@ pobject read(char *code)
             break;
         case TK_PAREN_CLOSE:
             moe_read_stack_macro(stack, cons_stack_pop(&stack));
+            break;
+        case TK_DOT:
+            dot_next = 1;
             break;
         }
     }; 

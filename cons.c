@@ -30,8 +30,9 @@ pobject cons_assoc_lookup(pobject list, pobject key)
 {
     if (is_cons(list)) {
         while (list && is_cons(cons_cdr(list))) {
-            if (cons_car(list) == key)
-                return cons_car(cons_cdr(list));
+            if (cons_car(list) == key) {
+                return cons_cdr(list);
+            }
             list = cons_cdr(cons_cdr(list));
         }
     }
@@ -42,12 +43,19 @@ pobject cons_assoc_lookup(pobject list, pobject key)
 void cons_list_append(pobject *list, pobject o)
 {
     pobject cur = *list;
+    if (is_cons(cur))
+        cons_list_last_cdr_set(list, cons_new(o, NIL));
+    else if (is_nil(cur))
+        *list = cons_new(o, NIL);
+}
+
+void cons_list_last_cdr_set(pobject *list, pobject o)
+{
+    pobject cur = *list;
     if (is_cons(cur)) {
         while (is_cons(cons_cdr(cur)))
             cur = cons_cdr(cur);
-        cons_cdr_set(cur, cons_new(o, NIL));
-    } else if (is_nil(cur)) {
-        *list = cons_new(o, NIL);
+        cons_cdr_set(cur, o);
     }
 }
 

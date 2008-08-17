@@ -10,11 +10,11 @@ pobject eval(pobject env, pobject code)
         if (is_cfunc(proc))
             return proc->data.cfunc(env, cons_cdr(code));
     } else if (is_symbol(code)) {
-        return cons_assoc_lookup(env, code);
+        pobject cons = cons_assoc_lookup(env, code);
+        return cons ? cons_car(cons) : NIL;
     } else {
         return code;
     }
 
     return NIL;
 }
-

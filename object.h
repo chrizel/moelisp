@@ -8,7 +8,7 @@ typedef pobject (*pcfunc)(pobject env, pobject params);
 
 /*
  * flags: 0000|0000
- *         ^^^|^^^^
+ *        ^^^^|^^^^
  *          GC|Type
  *            |
  */
@@ -23,6 +23,10 @@ struct object {
             pobject car;
             pobject cdr;
         } cons;
+        struct {
+            pobject env;
+            pobject code;
+        } closure;
     } data;
 };
 
@@ -32,6 +36,7 @@ struct object {
 #define T_NUMBER    0x03
 #define T_CFUNC     0x04
 #define T_CONS      0x05
+#define T_CLOSURE   0x06
 
 int object_new_count;
 int object_free_count;
@@ -54,6 +59,8 @@ static inline int is_cfunc(pobject o)
     { return object_type(o) == T_CFUNC; }
 static inline int is_cons(pobject o) 
     { return object_type(o) == T_CONS; }
+static inline int is_closure(pobject o)
+    { return object_type(o) == T_CLOSURE; }
 
 extern pobject object_new(char type);
 extern void object_free(pobject o);

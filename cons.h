@@ -9,6 +9,7 @@ extern void cons_assoc_set(pobject *list, pobject key, pobject value);
 extern pobject cons_assoc_lookup(pobject list, pobject key);
 
 extern void cons_list_append(pobject *list, pobject o);
+extern void cons_list_last_cdr_set(pobject *list, pobject o);
 extern pobject cons_list_last(pobject list);
 
 extern void cons_stack_push(pobject *stack, pobject o);
