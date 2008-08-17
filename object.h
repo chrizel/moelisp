@@ -33,9 +33,16 @@ struct object {
 #define T_CFUNC     0x04
 #define T_CONS      0x05
 
+int object_new_count;
+int object_free_count;
+
+pobject object_true;
+
 static inline int object_type(pobject o)
     { return o ? (o->flags & 0x0f) : NIL; }
 static inline int is_nil(pobject o) { return !o; }
+static inline pobject object_bool(int b)
+    { return b ? object_true : NIL; }
 
 static inline int is_symbol(pobject o) 
     { return object_type(o) == T_SYMBOL; }
@@ -51,7 +58,6 @@ static inline int is_cons(pobject o)
 extern pobject object_new(char type);
 extern void object_free(pobject o);
 extern int object_equal(pobject o1, pobject o2);
-
-pobject object_true;
+extern pobject object_prepend_begin(pobject o);
 
 #endif

@@ -26,7 +26,9 @@ static inline int is_symbol_char(int c)
         || (c == '?')
         || (c == '#')
         || (c == '=')
-        || (c == '!');
+        || (c == '!')
+        || (c == '>')
+        || (c == '<');
 }
 
 static int skip_spaces(char *code, int *pos)

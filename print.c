@@ -15,9 +15,13 @@ void print(pobject o)
         printf(symbol_value(o));
     else if (is_character(o))
         printf("#\\%c", character_value(o));
-    else if (is_number(o))
-        printf("%f", number_value(o));
-    else if (is_cfunc(o))
+    else if (is_number(o)) {
+        double v = number_value(o);
+        if (v == (double)((int)v))
+            printf("%.0f", v);
+        else
+            printf("%f", number_value(o));
+    } else if (is_cfunc(o))
         printf("#<cfunc:%p>", o->data.cfunc);
     else if (is_cons(o)) {
         printf("(");
