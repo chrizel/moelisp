@@ -12,34 +12,56 @@
 #include "builtin_core.h"
 #include "builtin_math.h"
 
-int main(int argc, char *argv[])
+static pobject global_env = NIL;
+
+static char * input()
 {
-    pobject env         = NIL;
+    static char buf[1024];
+    printf("\n> ");
+    fflush(stdout);
+    return fgets(buf, 1024, stdin);
+}
+
+static void init()
+{
     object_new_count    = 0;
     object_free_count   = 0;
     object_true         = symbol_intern("#t");
 
-    builtin_core_init(&env);
-    builtin_math_init(&env);
+    builtin_core_init(&global_env);
+    builtin_math_init(&global_env);
+}
 
-    printf(">> env: ");
-    println(env);
+static void cleanup()
+{
+    printf("\n\n* object_new_count = %d\n", object_new_count);
+    printf("* object_free_count = %d\n", object_free_count);
+    printf("* leaked objects = %d\n\n", object_new_count - object_free_count);
+}
 
-    if (argc > 1) {
+static void run()
+{
+    char *code;
+
+    printf("* global_env: ");
+    println(global_env);
+    while ((code = input())) {
         pobject ast;
-        printf(">> input string: %s\n", argv[1]);
+        printf("* input string: %s", code);
 
-        ast = read(argv[1]);
-        printf(">> parsed ast: ");
+        ast = moe_read(code);
+        printf("* parsed ast: ");
         println(ast);
 
-        printf(">> evaluated result: ");
-        println(eval(env, ast));
+        printf(" --> ");
+        println(eval(global_env, ast));
     }
+}
 
-    printf(">> object_new_count = %d\n", object_new_count);
-    printf(">> object_free_count = %d\n", object_free_count);
-    printf(">> leaked objects = %d\n", object_new_count - object_free_count);
-    
+int main(int argc, char *argv[])
+{
+    init();
+    run();
+    cleanup();
     return 0;
 }

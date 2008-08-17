@@ -91,7 +91,7 @@ static int next_token(char *code, int *start, int *end)
     } \
 }
 
-pobject read(char *code)
+pobject moe_read(char *code)
 {
     int type, start, end = 0, dot_next = 0;
     pobject stack = NIL;

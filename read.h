@@ -1,6 +1,6 @@
 #ifndef READ_H
 #define READ_H
 
-extern pobject read(char *code);
+extern pobject moe_read(char *code);
 
 #endif
