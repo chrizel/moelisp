@@ -1,6 +1,8 @@
 #include "builtin_core.h"
 #include "cfunc.h"
+#include "closure.h"
 #include "cons.h"
+#include "env.h"
 #include "eval.h"
 #include "number.h"
 #include "object.h"
@@ -58,12 +60,14 @@ static pobject quote(pobject env, pobject params)
 
 static pobject define(pobject env, pobject params)
 {
-    return NIL;
+    return env_define(env, 
+                      cons_car(params), 
+                      eval(env, cons_car(cons_cdr(params))));
 }
 
 static pobject lambda(pobject env, pobject params)
 {
-    return NIL;
+    return closure_new(env, cons_car(params), cons_cdr(params));
 }
 
 static pobject car(pobject env, pobject params)

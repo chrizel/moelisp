@@ -23,9 +23,11 @@ void print(pobject o)
             printf("%f", number_value(o));
     } else if (is_cfunc(o))
         printf("#<cfunc:%p>", o->data.cfunc);
-    else if (is_closure(o))
-        printf("#<closure:%p:%p>", o->data.closure.env, o->data.closure.code);
-    else if (is_cons(o)) {
+    else if (is_closure(o)) {
+        printf("#<closure:%p:{", o->data.closure.env);
+        print(o->data.closure.code);
+        printf("}>");
+    } else if (is_cons(o)) {
         printf("(");
 
         for (; is_cons(o); o = cons_cdr(o)) {
