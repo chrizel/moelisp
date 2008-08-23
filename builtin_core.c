@@ -76,6 +76,21 @@ static pobject define(pobject env, pobject params)
     return NIL;
 }
 
+static pobject set(pobject env, pobject params)
+{
+    pobject symbol = cons_car(params);
+    if (is_symbol(symbol)) {
+        pobject value = eval(env, cons_nth(params, 2));
+        pobject cons  = env_lookup(env, symbol);
+        if (is_cons(cons)) {
+            cons_car_set(cons, value);
+            return value;
+        }
+    }
+
+    return NIL;
+}
+
 static pobject defmacro(pobject env, pobject params)
 {
     pobject p = cons_car(params);
@@ -153,6 +168,7 @@ void builtin_core_init(pobject *env)
     cons_assoc_set(env, symbol_intern("println"),  cfunc_new(builtin_println));
     cons_assoc_set(env, symbol_intern("begin"),    cfunc_new(begin));
     cons_assoc_set(env, symbol_intern("cond"),     cfunc_new(cond));
+    cons_assoc_set(env, symbol_intern("set!"),     cfunc_new(set));
     cons_assoc_set(env, symbol_intern("define"),   cfunc_new(define));
     cons_assoc_set(env, symbol_intern("defmacro"),     cfunc_new(defmacro));
     cons_assoc_set(env, symbol_intern("macro-expand"), cfunc_new(builtin_macro_expand));

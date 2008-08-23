@@ -76,13 +76,23 @@ static pobject div(pobject env, pobject params)
     return number_new(result);
 }
 
+static pobject mod(pobject env, pobject params)
+{
+    pobject o1 = eval(env, cons_nth(params, 1));
+    pobject o2 = eval(env, cons_nth(params, 2));
+    return (is_number(o1) && is_number(o2))
+         ? (number_new( (int)number_value(o1) % (int)number_value(o2) ))
+         : NIL;
+}
+
 void builtin_math_init(pobject *env)
 {
     cons_assoc_set(env, symbol_intern("*pi*"), number_new(M_PI));
 
-    cons_assoc_set(env, symbol_intern("+"), cfunc_new(plus));
-    cons_assoc_set(env, symbol_intern("-"), cfunc_new(minus));
-    cons_assoc_set(env, symbol_intern("*"), cfunc_new(mult));
-    cons_assoc_set(env, symbol_intern("/"), cfunc_new(div));
+    cons_assoc_set(env, symbol_intern("+"),   cfunc_new(plus));
+    cons_assoc_set(env, symbol_intern("-"),   cfunc_new(minus));
+    cons_assoc_set(env, symbol_intern("*"),   cfunc_new(mult));
+    cons_assoc_set(env, symbol_intern("/"),   cfunc_new(div));
+    cons_assoc_set(env, symbol_intern("mod"), cfunc_new(mod));
 }
 

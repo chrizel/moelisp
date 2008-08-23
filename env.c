@@ -22,7 +22,7 @@ pobject env_lookup(pobject env, pobject symbol)
     while (env) {
         cons = cons_assoc_lookup(env, symbol);
         if (cons) 
-            return cons_car(cons);
+            return cons;
         env = cons_car( cons_assoc_lookup(env, symbol_parent_env) );
     }
 

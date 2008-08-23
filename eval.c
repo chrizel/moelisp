@@ -17,7 +17,7 @@ pobject eval(pobject env, pobject code)
         else if (is_macro(proc))
             return macro_eval(env, proc, cons_cdr(code));
     } else if (is_symbol(code)) {
-        return env_lookup(env, code);
+        return cons_car(env_lookup(env, code));
     } else {
         return code;
     }
