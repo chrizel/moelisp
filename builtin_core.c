@@ -60,9 +60,19 @@ static pobject quote(pobject env, pobject params)
 
 static pobject define(pobject env, pobject params)
 {
-    return env_define(env, 
-                      cons_car(params), 
-                      eval(env, cons_car(cons_cdr(params))));
+    pobject p = cons_car(params);
+
+    if (is_symbol(p)) {
+        return env_define(env, 
+                          cons_car(params), 
+                          eval(env, cons_car(cons_cdr(params))));
+    } else if (is_cons(p)) {
+        return env_define(env,
+                          cons_car(p),
+                          closure_new(env, cons_cdr(p), cons_cdr(params)));
+    }
+
+    return NIL;
 }
 
 static pobject lambda(pobject env, pobject params)

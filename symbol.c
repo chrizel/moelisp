@@ -14,6 +14,7 @@ static pobject symbol_new_by_slice(char *value, int start, int end)
     symbol_value_set(o, malloc(len + 1));
     strncpy(symbol_value(o), value + start, len);
     symbol_value(o)[len] = '\0';
+    o->data.symbol.length = len;
     return o;
 }
 
@@ -48,3 +49,13 @@ pobject symbol_intern_by_slice(char *value, int start, int end)
     cons_stack_push(&symbol_table, result);
     return result;
 }
+
+int symbol_ends_with_three_dots(pobject symbol)
+{
+    int len = symbol_length(symbol);
+    return (len > 2)
+        && (symbol_value(symbol)[len-1] == '.')
+        && (symbol_value(symbol)[len-2] == '.')
+        && (symbol_value(symbol)[len-3] == '.');
+}
+

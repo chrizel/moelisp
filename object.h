@@ -15,10 +15,13 @@ typedef pobject (*pcfunc)(pobject env, pobject params);
 struct object {
     char flags;
     union {
-        char *symbol;
         int character;
         double number;
         pcfunc cfunc;
+        struct {
+            int length;
+            char *value;
+        } symbol;
         struct {
             pobject car;
             pobject cdr;

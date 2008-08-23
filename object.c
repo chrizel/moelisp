@@ -16,7 +16,7 @@ pobject object_new(char type)
 void object_free(pobject o)
 {
     if (is_symbol(o))
-        free(o->data.symbol);
+        free(o->data.symbol.value);
     free(o);
     object_free_count++;
 }
