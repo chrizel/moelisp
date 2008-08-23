@@ -42,6 +42,7 @@ int object_new_count;
 int object_free_count;
 
 pobject object_true;
+pobject symbol_parent_env;
 
 static inline int object_type(pobject o)
     { return o ? (o->flags & 0x0f) : NIL; }

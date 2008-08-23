@@ -1,5 +1,6 @@
 #include "closure.h"
 #include "cons.h"
+#include "env.h"
 #include "number.h"
 #include "object.h"
 #include "symbol.h"
@@ -14,8 +15,7 @@ pobject eval(pobject env, pobject code)
             return closure_eval(env, proc, cons_cdr(code));
         }
     } else if (is_symbol(code)) {
-        pobject cons = cons_assoc_lookup(env, code);
-        return cons ? cons_car(cons) : NIL;
+        return env_lookup(env, code);
     } else {
         return code;
     }

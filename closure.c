@@ -3,6 +3,8 @@
 #include "env.h"
 #include "eval.h"
 #include "object.h"
+#include "print.h"
+#include "symbol.h"
 
 pobject closure_new(pobject env, pobject params, pobject code)
 {
@@ -12,20 +14,22 @@ pobject closure_new(pobject env, pobject params, pobject code)
     return o;
 }
 
-pobject closure_eval(pobject env, pobject closure, pobject params)
+pobject closure_eval(pobject call_env, pobject closure, pobject params)
 {
     pobject params_symbols = cons_car( closure->data.closure.code );
     pobject code = cons_cdr( closure->data.closure.code );
+    pobject env  = cons_new( symbol_parent_env, 
+                       cons_new( closure->data.closure.env, NIL ) );
 
-    /* TODO: make parent environment */
     while (params_symbols) {
-        env_define( env, 
-                    cons_car( params_symbols ), 
-                    eval( env, cons_car( params ) ) );
+        env = cons_new( cons_car( params_symbols),
+                  cons_new( eval( call_env, cons_car( params ) ), env ) );
         params_symbols = cons_cdr(params_symbols);
         params = cons_cdr(params);
     }
 
-    return eval(closure->data.closure.env, code);
+    println(env);
+
+    return eval(env, code);
 }
 
