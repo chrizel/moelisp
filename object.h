@@ -30,6 +30,10 @@ struct object {
             pobject env;
             pobject code;
         } closure;
+        struct {
+            pobject env;
+            pobject code;
+        } macro;
     } data;
 };
 
@@ -40,6 +44,7 @@ struct object {
 #define T_CFUNC     0x04
 #define T_CONS      0x05
 #define T_CLOSURE   0x06
+#define T_MACRO     0x07
 
 int object_new_count;
 int object_free_count;
@@ -65,6 +70,8 @@ static inline int is_cons(pobject o)
     { return object_type(o) == T_CONS; }
 static inline int is_closure(pobject o)
     { return object_type(o) == T_CLOSURE; }
+static inline int is_macro(pobject o)
+    { return object_type(o) == T_MACRO; }
 
 extern pobject object_new(char type);
 extern void object_free(pobject o);

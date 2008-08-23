@@ -81,7 +81,7 @@ static void run()
     println(global_env);
 */
     while ((code = input())) {
-        pobject ast;
+        pobject ast, result;
         /*
         printf("* input string: %s", code);
         */
@@ -92,16 +92,18 @@ static void run()
         println(ast);
         */
 
-        printf(" --> ");
-        println(eval(global_env, ast));
+        result = eval(global_env, ast);
+
+        printf("\n --> ");
+        println(result);
     }
 }
 
 int main(int argc, char *argv[])
 {
     init();
+    atexit(cleanup);
     eval_file("startup.lisp");
     run();
-    cleanup();
     return 0;
 }
