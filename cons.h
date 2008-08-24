@@ -16,9 +16,9 @@ extern void cons_stack_push(pobject *stack, pobject o);
 extern pobject cons_stack_pop(pobject *stack);
 
 static inline pobject cons_car(pobject o) 
-    { return is_nil(o) ? NIL : o->data.cons.car; }
+    { return is_cons(o) ? o->data.cons.car : NIL;  }
 static inline pobject cons_cdr(pobject o) 
-    { return is_nil(o) ? NIL : o->data.cons.cdr; }
+    { return is_cons(o) ? o->data.cons.cdr : NIL;  }
 
 static inline pobject cons_nth(pobject o, int nth)
 { 

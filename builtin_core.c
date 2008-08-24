@@ -127,6 +127,13 @@ static pobject macro(pobject env, pobject params)
     return macro_new(env, cons_car(params), cons_cdr(params));
 }
 
+static pobject apply(pobject env, pobject params)
+{
+    /* XXX: apply needs more work */
+    return eval_apply(env, eval(env, cons_car(params)), 
+                      eval(env, cons_nth(params, 2)));
+}
+
 static pobject car(pobject env, pobject params)
 {
     return cons_car(eval(env, cons_car(params)));
@@ -174,6 +181,7 @@ void builtin_core_init(pobject *env)
     cons_assoc_set(env, symbol_intern("macro-expand"), cfunc_new(builtin_macro_expand));
     cons_assoc_set(env, symbol_intern("lambda"),   cfunc_new(lambda));
     cons_assoc_set(env, symbol_intern("macro"),    cfunc_new(macro));
+    cons_assoc_set(env, symbol_intern("apply"),    cfunc_new(apply));
     cons_assoc_set(env, symbol_intern("car"),      cfunc_new(car));
     cons_assoc_set(env, symbol_intern("cdr"),      cfunc_new(cdr));
     cons_assoc_set(env, symbol_intern("cons"),     cfunc_new(cons));

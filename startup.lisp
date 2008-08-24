@@ -1,6 +1,12 @@
 (define x 3)
 (define y 4)
 
+(define (square x)
+ (* x x))
+
+(define (list params...)
+    params);
+
 (defmacro (if c then else...)
  (list (quote cond) (list c then) 
                     (cons #t else)))
@@ -30,16 +36,34 @@
                (filter func (cdr lst)))
          (filter func (cdr lst)))))
 
+(define (reduce func init lst)
+ (if lst
+     (func (car lst)
+           (reduce func init (cdr lst)))
+     init))
+
+(define (sum lst)
+ (reduce + 0 lst))
+
 (define (range from to)
   (when (> to from)
       (cons from (range (+ from 1) to))))
 
-(define (list params...)
-    params);
+(define funcs (list car cdr))
+(define args (list 1 2 3 4 5))
+
 
 (define (print-list x)
  (cond (x (println (car x))
           (print-list (cdr x)))))
+
+;(compose car cdr)
+;-->
+;(lambda (args...) (apply car (apply cdr args)))
+;
+(define (compose funcs...)
+ (lambda (args...)
+  (reduce apply args funcs)))
 
 
 ; (defmacro (let defs body...)
