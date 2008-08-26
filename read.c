@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "cons.h"
+#include "gc.h"
 #include "number.h"
 #include "object.h"
 #include "read.h"
@@ -87,7 +88,7 @@ static int next_token(char *code, int *start, int *end)
         cons_list_last_cdr_set( &(stack->data.cons.car), tmp); \
         dot_next = 0; \
     } else { \
-        cons_list_append( &(stack->data.cons.car), tmp ); \
+        cons_list_append( &(stack->data.cons.car), tmp, 1 ); \
     } \
 }
 
@@ -102,10 +103,10 @@ pobject moe_read(char *code)
             moe_read_stack_macro(stack, symbol_intern_by_slice(code, start, end));
             break;
         case TK_NUMBER:
-            moe_read_stack_macro(stack, number_new_by_slice(code, start, end));
+            moe_read_stack_macro(stack, gc_add( number_new_by_slice(code, start, end) ));
             break;
         case TK_PAREN_OPEN:
-            cons_stack_push(&stack, NIL);
+            cons_stack_push(&stack, NIL, 1);
             break;
         case TK_PAREN_CLOSE:
             moe_read_stack_macro(stack, cons_stack_pop(&stack));

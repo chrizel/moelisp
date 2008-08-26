@@ -4,6 +4,7 @@
 #include "cons.h"
 #include "env.h"
 #include "eval.h"
+#include "gc.h"
 #include "macro.h"
 #include "number.h"
 #include "object.h"
@@ -70,7 +71,7 @@ static pobject define(pobject env, pobject params)
     } else if (is_cons(p)) {
         return env_define(env,
                           cons_car(p),
-                          closure_new(env, cons_cdr(p), cons_cdr(params)));
+                          gc_add(closure_new(env, cons_cdr(p), cons_cdr(params))));
     }
 
     return NIL;
@@ -98,7 +99,7 @@ static pobject defmacro(pobject env, pobject params)
     if (is_cons(p)) {
         return env_define(env,
                           cons_car(p),
-                          macro_new(env, cons_cdr(p), cons_cdr(params)));
+                          gc_add(macro_new(env, cons_cdr(p), cons_cdr(params))));
     }
 
     return NIL;
@@ -119,12 +120,12 @@ static pobject builtin_macro_expand(pobject env, pobject params)
 
 static pobject lambda(pobject env, pobject params)
 {
-    return closure_new(env, cons_car(params), cons_cdr(params));
+    return gc_add(closure_new(env, cons_car(params), cons_cdr(params)));
 }
 
 static pobject macro(pobject env, pobject params)
 {
-    return macro_new(env, cons_car(params), cons_cdr(params));
+    return gc_add(macro_new(env, cons_car(params), cons_cdr(params)));
 }
 
 static pobject apply(pobject env, pobject params)
@@ -148,7 +149,7 @@ static pobject cons(pobject env, pobject params)
 {
     pobject o1 = eval(env, cons_car(params));
     pobject o2 = eval(env, cons_car(cons_cdr(params)));
-    return cons_new(o1, o2);
+    return gc_add(cons_new(o1, o2));
 }
 
 static pobject builtin_print(pobject env, pobject params)
@@ -165,26 +166,33 @@ static pobject builtin_println(pobject env, pobject params)
     return NIL;
 }
 
+static pobject collect(pobject env, pobject params)
+{
+    gc_collect(env);
+    return NIL;
+}
+
 void builtin_core_init(pobject *env)
 {
-    cons_assoc_set(env, symbol_intern("nil"),      NIL);
-    cons_assoc_set(env, symbol_intern("#t"),       object_true);
-    cons_assoc_set(env, symbol_intern("#f"),       NIL);
-    cons_assoc_set(env, symbol_intern("quote"),    cfunc_new(quote));
-    cons_assoc_set(env, symbol_intern("print"),    cfunc_new(builtin_print));
-    cons_assoc_set(env, symbol_intern("println"),  cfunc_new(builtin_println));
-    cons_assoc_set(env, symbol_intern("begin"),    cfunc_new(begin));
-    cons_assoc_set(env, symbol_intern("cond"),     cfunc_new(cond));
-    cons_assoc_set(env, symbol_intern("set!"),     cfunc_new(set));
-    cons_assoc_set(env, symbol_intern("define"),   cfunc_new(define));
-    cons_assoc_set(env, symbol_intern("defmacro"),     cfunc_new(defmacro));
-    cons_assoc_set(env, symbol_intern("macro-expand"), cfunc_new(builtin_macro_expand));
-    cons_assoc_set(env, symbol_intern("lambda"),   cfunc_new(lambda));
-    cons_assoc_set(env, symbol_intern("macro"),    cfunc_new(macro));
-    cons_assoc_set(env, symbol_intern("apply"),    cfunc_new(apply));
-    cons_assoc_set(env, symbol_intern("car"),      cfunc_new(car));
-    cons_assoc_set(env, symbol_intern("cdr"),      cfunc_new(cdr));
-    cons_assoc_set(env, symbol_intern("cons"),     cfunc_new(cons));
-    cons_assoc_set(env, symbol_intern("="),        cfunc_new(equal));
-    cons_assoc_set(env, symbol_intern(">"),        cfunc_new(gt));
+    cons_assoc_set(env, symbol_intern("nil"),      NIL, 1);
+    cons_assoc_set(env, symbol_intern("#t"),       object_true, 1);
+    cons_assoc_set(env, symbol_intern("#f"),       NIL, 1);
+    cons_assoc_set(env, symbol_intern("quote"),    gc_add(cfunc_new(quote)), 1);
+    cons_assoc_set(env, symbol_intern("print"),    gc_add(cfunc_new(builtin_print)), 1);
+    cons_assoc_set(env, symbol_intern("println"),  gc_add(cfunc_new(builtin_println)), 1);
+    cons_assoc_set(env, symbol_intern("begin"),    gc_add(cfunc_new(begin)), 1);
+    cons_assoc_set(env, symbol_intern("cond"),     gc_add(cfunc_new(cond)), 1);
+    cons_assoc_set(env, symbol_intern("set!"),     gc_add(cfunc_new(set)), 1);
+    cons_assoc_set(env, symbol_intern("define"),   gc_add(cfunc_new(define)), 1);
+    cons_assoc_set(env, symbol_intern("defmacro"),     gc_add(cfunc_new(defmacro)), 1);
+    cons_assoc_set(env, symbol_intern("macro-expand"), gc_add(cfunc_new(builtin_macro_expand)), 1);
+    cons_assoc_set(env, symbol_intern("lambda"),   gc_add(cfunc_new(lambda)), 1);
+    cons_assoc_set(env, symbol_intern("macro"),    gc_add(cfunc_new(macro)), 1);
+    cons_assoc_set(env, symbol_intern("apply"),    gc_add(cfunc_new(apply)), 1);
+    cons_assoc_set(env, symbol_intern("car"),      gc_add(cfunc_new(car)), 1);
+    cons_assoc_set(env, symbol_intern("cdr"),      gc_add(cfunc_new(cdr)), 1);
+    cons_assoc_set(env, symbol_intern("cons"),     gc_add(cfunc_new(cons)), 1);
+    cons_assoc_set(env, symbol_intern("collect"),  gc_add(cfunc_new(collect)), 1);
+    cons_assoc_set(env, symbol_intern("="),        gc_add(cfunc_new(equal)), 1);
+    cons_assoc_set(env, symbol_intern(">"),        gc_add(cfunc_new(gt)), 1);
 }

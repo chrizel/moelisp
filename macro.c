@@ -1,7 +1,8 @@
-#include "macro.h"
 #include "cons.h"
 #include "env.h"
 #include "eval.h"
+#include "gc.h"
+#include "macro.h"
 #include "object.h"
 #include "print.h"
 #include "symbol.h"
@@ -10,7 +11,7 @@ pobject macro_new(pobject env, pobject params, pobject code)
 {
     pobject o = object_new(T_MACRO);
     o->data.macro.env = env;
-    o->data.macro.code = cons_new(params, object_prepend_begin(code));
+    o->data.macro.code = gc_add( cons_new(params, object_prepend_begin(code)) );
     return o;
 }
 
@@ -19,8 +20,8 @@ pobject macro_expand(pobject call_env, pobject macro, pobject params)
     pobject symbol, values;
     pobject params_symbols = cons_car( macro->data.macro.code );
     pobject code = cons_cdr( macro->data.macro.code );
-    pobject env  = cons_new( symbol_parent_env, 
-                       cons_new( macro->data.macro.env, NIL ) );
+    pobject env  = gc_add( cons_new( symbol_parent_env, 
+                       gc_add( cons_new( macro->data.macro.env, NIL ) ) ) );
 
     while (params_symbols) {
         symbol = cons_car(params_symbols);
@@ -32,14 +33,14 @@ pobject macro_expand(pobject call_env, pobject macro, pobject params)
                                             symbol_length(symbol) - 3);
             values = NIL;
             while (params) {
-                cons_list_append(&values, cons_car( params ) );
+                cons_list_append(&values, cons_car( params ), 1);
                 params = cons_cdr(params);
             }
-            env = cons_new( symbol, cons_new( values, env ) );
+            env = gc_add( cons_new( symbol, gc_add( cons_new( values, env ) ) ) );
             break;
         } else {
-            env = cons_new( symbol,
-                      cons_new( cons_car( params ), env ) );
+            env = gc_add( cons_new( symbol,
+                      gc_add( cons_new( cons_car( params ), env ) ) ) );
             params_symbols = cons_cdr(params_symbols);
             params = cons_cdr(params);
         }

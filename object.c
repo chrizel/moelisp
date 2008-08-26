@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "cons.h"
+#include "gc.h"
 #include "number.h"
 #include "object.h"
 #include "symbol.h"
@@ -10,11 +12,17 @@ pobject object_new(char type)
     pobject o = malloc(sizeof(struct object));
     o->flags = type;
     object_new_count++;
+    /*
+    printf("object_new %p\n", o);
+    */
     return o;
 }
 
 void object_free(pobject o)
 {
+    /*
+    printf("object_free %p\n", o);
+    */
     if (is_symbol(o))
         free(o->data.symbol.value);
     free(o);
@@ -47,6 +55,6 @@ pobject object_prepend_begin(pobject o)
 {
     static pobject begin = NIL;
     if (!begin) begin = symbol_intern("begin");
-    return is_cons(o) ? cons_new(begin, o) : o;
+    return is_cons(o) ? gc_add( cons_new(begin, o) ) : o;
 }
 

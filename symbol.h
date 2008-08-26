@@ -11,4 +11,6 @@ static inline char *symbol_value(pobject o) { return o->data.symbol.value; }
 static inline void symbol_value_set(pobject o, char *v) { o->data.symbol.value = v; }
 static inline int symbol_length(pobject o) { return o->data.symbol.length; }
 
+extern void symbol_cleanup();
+
 #endif

@@ -1,5 +1,6 @@
-#include "object.h"
 #include "cons.h"
+#include "gc.h"
+#include "object.h"
 
 pobject cons_new(pobject car, pobject cdr)
 {
@@ -9,7 +10,7 @@ pobject cons_new(pobject car, pobject cdr)
     return o;
 }
 
-void cons_assoc_set(pobject *list, pobject key, pobject value)
+void cons_assoc_set(pobject *list, pobject key, pobject value, int gc)
 {
     if (is_cons(*list)) {
         pobject cur = *list;
@@ -23,7 +24,7 @@ void cons_assoc_set(pobject *list, pobject key, pobject value)
         }
     }
 
-    *list = cons_new(key, cons_new(value, *list));
+    *list = gc_add_if( gc, cons_new(key, cons_new(value, *list)) );
 }
 
 pobject cons_assoc_lookup(pobject list, pobject key)
@@ -40,13 +41,13 @@ pobject cons_assoc_lookup(pobject list, pobject key)
     return NIL;
 }
 
-void cons_list_append(pobject *list, pobject o)
+void cons_list_append(pobject *list, pobject o, int gc)
 {
     pobject cur = *list;
     if (is_cons(cur))
-        cons_list_last_cdr_set(list, cons_new(o, NIL));
+        cons_list_last_cdr_set(list, gc_add_if( gc, cons_new(o, NIL) ));
     else if (is_nil(cur))
-        *list = cons_new(o, NIL);
+        *list = gc_add_if(gc, cons_new(o, NIL));
 }
 
 void cons_list_last_cdr_set(pobject *list, pobject o)
@@ -70,9 +71,19 @@ pobject cons_list_last(pobject list)
     return NIL;
 }
 
-void cons_stack_push(pobject *stack, pobject o)
+int cons_list_length(pobject list)
 {
-    *stack = cons_new(o, *stack);
+    int length = 0;
+    while (is_cons(list)) {
+        ++length;
+        list = cons_cdr(list);
+    }
+    return length;
+}
+
+void cons_stack_push(pobject *stack, pobject o, int gc)
+{
+    *stack = gc_add_if(gc, cons_new(o, *stack));
 }
 
 pobject cons_stack_pop(pobject *stack)

@@ -3,6 +3,7 @@
 #include "closure.h"
 #include "cons.h"
 #include "env.h"
+#include "gc.h"
 #include "macro.h"
 #include "number.h"
 #include "object.h"
@@ -12,12 +13,14 @@
 pobject eval_apply(pobject env, pobject proc, pobject params)
 {
     if (!(is_nil(params) || is_cons(params)))
-        params = cons_new(params, NIL);
+        params = gc_add( cons_new(params, NIL) );
 
+    /*
     printf("* ");
     print(proc);
     printf(": ");
     println(params);
+    */
 
     if (is_cfunc(proc))
         return proc->data.cfunc(env, params);

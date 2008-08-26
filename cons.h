@@ -5,14 +5,15 @@
 
 extern pobject cons_new(pobject car, pobject cdr);
 
-extern void cons_assoc_set(pobject *list, pobject key, pobject value);
+extern void cons_assoc_set(pobject *list, pobject key, pobject value, int gc);
 extern pobject cons_assoc_lookup(pobject list, pobject key);
 
-extern void cons_list_append(pobject *list, pobject o);
+extern void cons_list_append(pobject *list, pobject o, int gc);
 extern void cons_list_last_cdr_set(pobject *list, pobject o);
 extern pobject cons_list_last(pobject list);
+extern int cons_list_length(pobject list);
 
-extern void cons_stack_push(pobject *stack, pobject o);
+extern void cons_stack_push(pobject *stack, pobject o, int gc);
 extern pobject cons_stack_pop(pobject *stack);
 
 static inline pobject cons_car(pobject o) 

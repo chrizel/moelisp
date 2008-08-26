@@ -46,7 +46,7 @@ pobject symbol_intern_by_slice(char *value, int start, int end)
     }
 
     result = symbol_new_by_slice(value, start, end);
-    cons_stack_push(&symbol_table, result);
+    cons_stack_push(&symbol_table, result, 0);
     return result;
 }
 
@@ -57,5 +57,16 @@ int symbol_ends_with_three_dots(pobject symbol)
         && (symbol_value(symbol)[len-1] == '.')
         && (symbol_value(symbol)[len-2] == '.')
         && (symbol_value(symbol)[len-3] == '.');
+}
+
+void symbol_cleanup()
+{
+    pobject next;
+    while (is_cons(symbol_table)) {
+        next = cons_cdr(symbol_table);
+        object_free(cons_car(symbol_table));
+        object_free(symbol_table);
+        symbol_table = next;
+    }
 }
 
