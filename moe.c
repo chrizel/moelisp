@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <unistd.h>
 
 #include "cfunc.h"
 #include "cons.h"
@@ -68,46 +70,27 @@ static void init()
 
 static void cleanup()
 {
-    printf("\n\nBefore gc_collect:\n* object_new_count = %d\n", object_new_count);
-    printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n", object_new_count - object_free_count);
-
     gc_collect(NIL);
-
-    printf("\n\nAfter gc_collect:\n* object_new_count = %d\n", object_new_count);
-    printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n", object_new_count - object_free_count);
-
     symbol_cleanup();
+}
 
-    printf("\n\nAfter symbol_cleanup:\n* object_new_count = %d\n", object_new_count);
-    printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n", object_new_count - object_free_count);
+static void cleanup_signal_handler(int sig)
+{
+    cleanup();
+    signal(sig, SIG_DFL);
+    kill(getpid(), sig);
 }
 
 static void run()
 {
     char *code;
 
-/*
-    printf("* global_env: ");
-    println(global_env);
-*/
     while ((code = input())) {
         pobject ast, result;
-        /*
-        printf("* input string: %s", code);
-        */
-
         ast = moe_read(code);
-        /*
-        printf("* parsed ast: ");
-        println(ast);
-        */
-
         result = eval(global_env, ast);
 
-        printf("\n --> ");
+        printf(" --> ");
         println(result);
     }
 }
@@ -115,7 +98,11 @@ static void run()
 int main(int argc, char *argv[])
 {
     init();
+
     atexit(cleanup);
+    signal(SIGINT, cleanup_signal_handler);
+    signal(SIGKILL, cleanup_signal_handler);
+
     eval_file("startup.lisp");
     run();
     return 0;
