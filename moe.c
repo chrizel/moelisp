@@ -68,21 +68,21 @@ static void init()
 
 static void cleanup()
 {
-    printf("\n\n* object_new_count = %d\n", object_new_count);
+    printf("\n\nBefore gc_collect:\n* object_new_count = %d\n", object_new_count);
     printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n\n", object_new_count - object_free_count);
+    printf("* leaked objects = %d\n", object_new_count - object_free_count);
 
     gc_collect(NIL);
 
-    printf("\n\n* object_new_count = %d\n", object_new_count);
+    printf("\n\nAfter gc_collect:\n* object_new_count = %d\n", object_new_count);
     printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n\n", object_new_count - object_free_count);
+    printf("* leaked objects = %d\n", object_new_count - object_free_count);
 
     symbol_cleanup();
 
-    printf("\n\n* object_new_count = %d\n", object_new_count);
+    printf("\n\nAfter symbol_cleanup:\n* object_new_count = %d\n", object_new_count);
     printf("* object_free_count = %d\n", object_free_count);
-    printf("* leaked objects = %d\n\n", object_new_count - object_free_count);
+    printf("* leaked objects = %d\n", object_new_count - object_free_count);
 }
 
 static void run()

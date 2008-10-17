@@ -14,5 +14,7 @@ static inline void gc_flag_set(pobject o, int value)
     { o->flags = (value & 0x10) | (o->flags & 0xef); }
 static inline pobject gc_add_if(int cond, pobject o)
     { return cond ? gc_add(o) : o; } 
+static inline int gc_responsibility(pobject o)
+    { return o->flags & 0x20; }
 
 #endif

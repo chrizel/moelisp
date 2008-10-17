@@ -24,7 +24,8 @@ void cons_assoc_set(pobject *list, pobject key, pobject value, int gc)
         }
     }
 
-    *list = gc_add_if( gc, cons_new(key, cons_new(value, *list)) );
+    *list = gc_add_if( gc, cons_new(key,
+                gc_add_if( gc, cons_new(value, *list) ) ) );
 }
 
 pobject cons_assoc_lookup(pobject list, pobject key)
@@ -92,7 +93,8 @@ pobject cons_stack_pop(pobject *stack)
         pobject result = cons_car(*stack);
         pobject cons = *stack;
         *stack = cons_cdr(cons);
-        object_free(cons);
+        if (!gc_responsibility(cons))
+            object_free(cons);
         return result;
     }
 

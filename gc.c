@@ -9,8 +9,10 @@ static pobject gc_list = NIL;
 
 pobject gc_add(pobject object)
 {
-    if (object && (!is_symbol(object)))
+    if (object && !is_symbol(object) && !(object->flags & 0x20)) {
         gc_list = cons_new(object, gc_list);
+        object->flags |= 0x20;
+    }
     return object;
 }
 

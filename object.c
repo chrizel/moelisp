@@ -12,17 +12,11 @@ pobject object_new(char type)
     pobject o = malloc(sizeof(struct object));
     o->flags = type;
     object_new_count++;
-    /*
-    printf("object_new %p\n", o);
-    */
     return o;
 }
 
 void object_free(pobject o)
 {
-    /*
-    printf("object_free %p\n", o);
-    */
     if (is_symbol(o))
         free(o->data.symbol.value);
     free(o);
