@@ -12,6 +12,7 @@ extern void cons_list_append(pobject *list, pobject o, int gc);
 extern void cons_list_last_cdr_set(pobject *list, pobject o);
 extern pobject cons_list_last(pobject list);
 extern int cons_list_length(pobject list);
+extern pobject cons_list_find(pobject list, pobject o);
 
 extern void cons_stack_push(pobject *stack, pobject o, int gc);
 extern pobject cons_stack_pop(pobject *stack);

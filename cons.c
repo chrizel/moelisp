@@ -82,6 +82,17 @@ int cons_list_length(pobject list)
     return length;
 }
 
+pobject cons_list_find(pobject list, pobject o)
+{
+    while (is_cons(list)) {
+        if (cons_car(list) == o)
+            return cons_car(list);
+        list = cons_cdr(list);
+    }
+
+    return NIL;
+}
+
 void cons_stack_push(pobject *stack, pobject o, int gc)
 {
     *stack = gc_add_if(gc, cons_new(o, *stack));
