@@ -5,41 +5,17 @@
 #include "object.h"
 #include "print.h"
 
+#define GC_FLAG_ON (1 << 4)
+
 static pobject gc_list = NIL;
+static int gc_objects = 0;
 
-pobject gc_add(pobject object)
-{
-    if (object && !is_symbol(object) && !(object->flags & 0x20)) {
-        gc_list = cons_new(object, gc_list);
-        object->flags |= 0x20;
-    }
-    return object;
-}
-
-void gc_free(pobject object)
-{
-    pobject prev = NIL, cur;
-
-    /* look for the cons cell in gc_list for object */
-    cur = gc_list;
-    while (cur) {
-        if (cons_car(cur) == object)
-            break;
-        prev = cur;
-        cur = cons_cdr(cur);
-    }
-
-    /* set new gc_list connections and free the cur cons cell */
-    if (cur) {
-        if (prev)
-            cons_cdr_set(prev, cons_cdr(cur));
-        else
-            gc_list = cons_cdr(cur);
-        object_free(cur);
-    }
-
-    object_free(object);
-}
+static inline int gc_flag_get(pobject o)
+    { return o->flags & 0x10; }
+static inline void gc_flag_set(pobject o, int value)
+    { o->flags = (value & 0x10) | (o->flags & 0xef); }
+static inline void gc_free(pobject o)
+    { --gc_objects; object_free(o); }
 
 static void gc_traverse(pobject env)
 {
@@ -72,6 +48,7 @@ static void gc_traverse(pobject env)
 void gc_collect(pobject env)
 {
     int collected = 0;
+    int old_count = gc_objects;
     pobject prev, cur, object;
 
     /* set gc flag of all gc_list objects to 0 */
@@ -91,7 +68,7 @@ void gc_collect(pobject env)
     while (cur) {
         object = cons_car(cur);
         if (gc_flag_get(object) == 0) {
-            object_free(object);
+            gc_free(object);
             collected++;
             if (prev) {
                 cons_cdr_set(prev, cons_cdr(cur));
@@ -108,5 +85,24 @@ void gc_collect(pobject env)
         }
     }
 
-    printf("@@@ %d objects collected\n", collected);
+    printf("\ngc_collect: %d of %d objects collected\n", collected, old_count);
 }
+
+void gc_collect_if_required(pobject env)
+{
+    /*
+    static int object_space = (sizeof (struct object)) * 2;
+    TODO
+    */
+}
+
+pobject gc_add(pobject object)
+{
+    if (object && !is_symbol(object) && !(object->flags & 0x20)) {
+        gc_list = cons_new(object, gc_list);
+        object->flags |= 0x20;
+        ++gc_objects;
+    }
+    return object;
+}
+
