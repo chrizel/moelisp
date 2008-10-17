@@ -1,11 +1,8 @@
-(define x 3)
-(define y 4)
-
-(define (square x)
- (* x x))
-
+;;
+;; core
+;;
 (define (list params...)
-    params);
+    params)
 
 (defmacro (if c then else...)
  (list (quote cond) (list c then) 
@@ -18,12 +15,19 @@
     (cond (x nil)
           (#t #t)))
 
-(define (even x)
- (= (mod x 2) 0))
+(define (compose funcs...)
+ (lambda (args...)
+  (reduce apply args funcs)))
 
-(define (odd x)
- (not (even x)))
+(defmacro (let defs body...)
+    (list (quote apply) 
+        (cons (quote lambda)
+            (cons (map car defs) body))
+     (cons (quote list) (map second defs))))
 
+;;
+;; list operations
+;;
 (define (map func lst)
  (when (car lst)
      (cons (func (car lst))
@@ -42,39 +46,36 @@
            (reduce func init (cdr lst)))
      init))
 
+(define (length lst)
+ (reduce (lambda (_ x) (+ x 1)) 0 lst))
+
 (define (sum lst)
  (reduce + 0 lst))
 
 (define (range from to)
-  (when (> to from)
-      (cons from (range (+ from 1) to))))
-
-(define funcs (list car cdr))
-(define args (list 1 2 3 4 5))
-
+ (let ((from (if to from 0))
+       (to (if to to from)))
+      (when (> to from)
+          (cons from (range (+ from 1) to)))))
 
 (define (print-list x)
  (cond (x (println (car x))
           (print-list (cdr x)))))
 
-;(compose car cdr)
-;-->
-;(lambda (args...) (apply car (apply cdr args)))
-;
-(define (compose funcs...)
- (lambda (args...)
-  (reduce apply args funcs)))
+(define (second lst)
+    (car (cdr lst)))
+
+;;
+;; math
+;;
+(define (square x)
+ (* x x))
+
+(define (even x)
+ (= (mod x 2) 0))
+
+(define (odd x)
+ (not (even x)))
 
 
-; (defmacro (let defs body...)
-;  (define x (
-;
-; (let ((x 5)
-;       (y 3)
-;       (z 4))
-;  (+ x y z))
-; 
-; -->
-; 
-; ((lambda (x y z)
-;   (+ x y z)) 5 3 4)
+(collect)
