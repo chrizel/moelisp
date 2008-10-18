@@ -17,21 +17,10 @@
 
 static inline int is_symbol_char(int c)
 {
-    return (c >= 'a' && c <= 'z')
-        || (c >= 'A' && c <= 'Z')
-        || (c >= '0' && c <= '9')
-        || (c == '-')
-        || (c == '_')
-        || (c == '*')
-        || (c == '/')
-        || (c == '+')
-        || (c == '?')
-        || (c == '#')
-        || (c == '=')
-        || (c == '!')
-        || (c == '.')
-        || (c == '>')
-        || (c == '<');
+    return (!isspace(c))
+        && (c != '(')
+        && (c != ')')
+        && (c != ';');
 }
 
 static int skip_spaces(char *code, int *pos)

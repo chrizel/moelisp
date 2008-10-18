@@ -5,7 +5,7 @@ HEADERS = object.h number.h character.h cons.h symbol.h read.h print.h eval.h cf
 $(BINARY): $(SOURCES) $(HEADERS)
 	gcc -Wall -lm -g -o $(BINARY) $(SOURCES)
 
-test:
+test: $(BINARY)
 	./t/do-tests.sh
 
 clean:
