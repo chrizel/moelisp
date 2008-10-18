@@ -52,6 +52,8 @@ static pobject eval_file(char *filename)
         free(buf);
 
         return result;
+    } else {
+        fprintf(stderr, "cannot open file: %s\n", filename);
     }
 
     return NIL;
@@ -104,6 +106,12 @@ int main(int argc, char *argv[])
     signal(SIGKILL, cleanup_signal_handler);
 
     eval_file("startup.lisp");
-    run();
+    if (argc > 1) {
+        int i;
+        for (i = 1; i < argc; ++i)
+            eval_file(argv[i]);
+    } else {
+        run();
+    }
     return 0;
 }

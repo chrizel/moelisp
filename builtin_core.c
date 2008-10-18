@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "builtin_core.h"
 #include "cfunc.h"
 #include "closure.h"
@@ -161,9 +164,20 @@ static pobject builtin_print(pobject env, pobject params)
 
 static pobject builtin_println(pobject env, pobject params)
 {
-    pobject o = eval(env, cons_car(params));
-    println(o);
+    if (is_nil(cons_car(params))) {
+        printf("\n");
+    } else {
+        pobject o = eval(env, cons_car(params));
+        println(o);
+    }
     return NIL;
+}
+
+static pobject builtin_exit(pobject env, pobject params)
+{
+    pobject o = eval(env, cons_car(params));
+    int code = is_number(o) ? number_value(o) : 0;
+    exit(code);
 }
 
 static pobject collect(pobject env, pobject params)
@@ -195,4 +209,5 @@ void builtin_core_init(pobject *env)
     cons_assoc_set(env, symbol_intern("collect"),  gc_add(cfunc_new(collect)), 1);
     cons_assoc_set(env, symbol_intern("="),        gc_add(cfunc_new(equal)), 1);
     cons_assoc_set(env, symbol_intern(">"),        gc_add(cfunc_new(gt)), 1);
+    cons_assoc_set(env, symbol_intern("exit"),     gc_add(cfunc_new(builtin_exit)), 1);
 }

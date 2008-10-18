@@ -48,7 +48,9 @@ static void gc_traverse(pobject env)
 void gc_collect(pobject env)
 {
     int collected = 0;
+    /*
     int old_count = gc_objects;
+    */
     pobject prev, cur, object;
 
     /* set gc flag of all gc_list objects to 0 */
@@ -85,7 +87,9 @@ void gc_collect(pobject env)
         }
     }
 
+    /*
     printf("\ngc_collect: %d of %d objects collected\n", collected, old_count);
+    */
 }
 
 void gc_collect_if_required(pobject env)

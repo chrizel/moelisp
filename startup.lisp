@@ -4,6 +4,9 @@
 (define (list params...)
     params)
 
+(define (!= x y)
+ (not (= x y)))
+
 (defmacro (if c then else...)
  (list (quote cond) (list c then) 
                     (cons #t else)))
