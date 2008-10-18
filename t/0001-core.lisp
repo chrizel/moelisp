@@ -1,3 +1,4 @@
+;; generic tests
 (test   0  (= 0 0))
 (test   1  (= 1 1))
 (test   2  (!= 0 1))
@@ -11,3 +12,88 @@
 (test  10  (not nil))
 (test  11  (= nil (not #t)))
 (test  12  (= #t (not #f)))
+(test  13  (= (if 1 2 3) 2))
+(test  14  (= (if nil 2 3) 3))
+(test  15  (= (when 1 2) 2))
+(test  16  (= (when nil 2) nil))
+(test  17  (= (begin 1 2 3) 3))
+(test  18  (= (cond ((= 0 1) 33)
+                    ((= 4 2) 19)
+                    ((= 7 7) 83)
+                    ((= 8 8) 91)) 83))
+(test  19  (= (cond ((= 8 2) 17)
+                    ((= 4 3) 7)
+                    ((= 3 2) 99)) nil))
+
+;; test define and set!
+(define x 1)
+(test  20  (= x 1))
+
+(define y 1)
+(test  21  (= x y))
+
+(set! y 2)
+(test  22  (= y 2))
+(test  23  (= x 1))
+
+(set! x 2)
+(test  24  (= x 2))
+(test  25  (= x y))
+
+;; test lambda
+(test  26  (= ((lambda (x) x) 42) 42))
+(test  27  (= ((lambda (x) (+ x 3)) 5) 8))
+(test  28  (= ((lambda (x y) (+ x (* x y))) 9 6) 63))
+(test  29  (= ((lambda (x) 2 x 4 85) 3) 85))
+(test  30  (= ((lambda (x)
+                   ((lambda (y)
+                        (+ (* x y) (- x y))) 13)) 107) 1485))
+
+(define x 9)
+(test  31  (= x 9))
+((lambda (x)
+     (test  32  (= x 4))) 4)
+(test  33  (= x 9))
+
+(define x 88)
+(define y 42)
+(test  34  (= x 88))
+(test  35  (= y 42))
+((lambda (x y)
+     (test  36  (= x 6))
+     (test  37  (= y 113))) 6 113)
+(test  38  (= x 88))
+(test  39  (= y 42))
+
+;; test function definitions
+(define (foobar a) a)
+(test  40  (= (foobar 9) 9))
+(test  41  (= (foobar 7) (foobar 7)))
+
+(define (bla c) (* c 3 (+ c 7)))
+(test  42  (= (bla 9) 432))
+(test  43  (= (bla 7) (bla 7)))
+(test  44  (!= (bla 4) (foobar 4)))
+
+(define (bla c) (* c 3 (+ c 7)))
+(define (xyz c)
+    (test  45  (= (bla c) 180))
+    (define (bla c)
+        (* (+ c 2) 99))
+    (test  46  (= (bla c) 693))
+    (* c 8))
+(test  47  (= (xyz 5) 40))
+(test  48  (= (bla 78) 19890))
+
+;; test recursion
+(define (fib n)
+    (cond ((= n 0) 0)
+          ((= n 1) 1)
+          ((= n 2) 1)
+          (#t (+ (fib (- n 1))
+                 (fib (- n 2))))))
+(test  49  (= (fib 5) 5))
+(test  50  (= (fib 8) 21))
+(test  51  (= (fib 10) 55))
+
+

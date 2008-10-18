@@ -8,3 +8,7 @@
 (test   7  (= (/ 24 3 2) 4))
 (test   8  (= (mod 8 5) 3))
 (test   9  (= (mod 9 9) (mod 42 42)))
+(test  10  (= (square 9) 81))
+(test  11  (= (square 5) 25))
+(test  12  (even 8))
+(test  13  (odd 51))
