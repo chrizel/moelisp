@@ -6,7 +6,7 @@ $(BINARY): $(SOURCES) $(HEADERS)
 	gcc -Wall -lm -g -o $(BINARY) $(SOURCES)
 
 test: $(BINARY)
-	./t/do-tests.sh
+	@perl ./t/do-tests.pl
 
 clean:
 	rm -rf $(BINARY) *.o
