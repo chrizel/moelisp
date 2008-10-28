@@ -68,6 +68,14 @@
 (define (second lst)
     (car (cdr lst)))
 
+(define (reverse lst)
+    (define (internal-reverse sub-lst new-lst)
+        (if sub-lst
+            (internal-reverse (cdr sub-lst)
+                              (cons (car sub-lst) new-lst))
+            new-lst))
+    (internal-reverse lst nil))
+
 ;;
 ;; math
 ;;

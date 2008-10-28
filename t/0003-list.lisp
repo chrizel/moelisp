@@ -49,3 +49,6 @@
 (test  22  (= (second (list 6 5 2 3)) 5))
 (test  23  (= (second (list (list 1 2) (list 2 3) (list 3 4)))
               (list 2 3)))
+(test  24  (= (reverse (list 1 2 3)) (list 3 2 1)))
+(test  25  (= (reverse (list (cons 1 2) (cons 2 3) (cons 3 4)))
+              (list (cons 3 4) (cons 2 3) (cons 1 2))))
