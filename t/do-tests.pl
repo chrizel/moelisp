@@ -4,8 +4,19 @@ use warnings;
 use strict;
 use Term::ANSIColor;
 
+my $test_name_width = 16;
+
+sub print_test_row {
+    my ($test_name, $right, $num) = @_;
+    my $dots = '.' x ($test_name_width - length $test_name);
+    my $s = $num > 1 ? 's' : '';
+    my $tests = sprintf '%3d %-5s ', $num, "test$s";
+    print $test_name . $dots . $tests;
+}
+
 my @tests = glob "./t/????-*.lisp";
 my $wrong_sum = 0;
+my $sum = 0;
 
 foreach my $test (@tests) {
     my $out = `./moe ./t/testlib.lisp $test`;
@@ -15,16 +26,26 @@ foreach my $test (@tests) {
     my $num = 0;
     my @wrong = ();
 
-    foreach my $c (split //, $out) {
-        if ($c eq "-") {
-            ++$right;
+    if ($name eq "0000-test") {
+        $num = length $out;
+        if ($out eq "-!!---!!!-!") {
+            $right = $num;
         } else {
-            push @wrong, ($num);
+            $right = 0;
+            @wrong = (0..$num);
         }
-        ++$num;
+    } else {
+        foreach my $c (split //, $out) {
+            if ($c eq "-") {
+                ++$right;
+            } else {
+                push @wrong, ($num);
+            }
+            ++$num;
+        }
     }
 
-    print "$name: ";
+    print_test_row $name, $right, $num;
     if ($right == $num) {
         print color 'green';
         print "ok\n";
@@ -41,6 +62,7 @@ foreach my $test (@tests) {
 
         $wrong_sum += @wrong;
     }
+    $sum += $num;
 }
 
 print "---\n";
@@ -51,6 +73,6 @@ if ($wrong_sum > 0) {
     print color 'reset';
 } else {
     print color 'green';
-    print "All tests are ok.\n";
+    print "All $sum tests are ok.\n";
     print color 'reset';
 }
