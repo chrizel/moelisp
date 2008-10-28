@@ -2,3 +2,4 @@ moe
 *.o
 *.dSYM
 *.swp
+*.exe
