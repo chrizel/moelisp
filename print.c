@@ -12,7 +12,7 @@ void print(pobject o)
     if (is_nil(o))
         printf("nil");
     else if (is_symbol(o))
-        printf(symbol_value(o));
+        printf("%s", symbol_value(o));
     else if (is_character(o))
         printf("#\\%c", character_value(o));
     else if (is_number(o)) {
