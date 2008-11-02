@@ -32,12 +32,9 @@ static void gc_traverse(pobject env)
             /* XXX: dotted list support??? */
             if (is_cons(object)) {
                 gc_traverse(object);
-            } else if (is_closure(object)) {
+            } else if (is_closure(object) || is_macro(object)) {
                 gc_traverse(object->data.closure.env);
                 gc_traverse(object->data.closure.code);
-            } else if (is_macro(object)) {
-                gc_traverse(object->data.macro.env);
-                gc_traverse(object->data.macro.code);
             }
 
         }

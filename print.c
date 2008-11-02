@@ -28,8 +28,8 @@ void print(pobject o)
         print(o->data.closure.code);
         printf("}>");
     } else if (is_macro(o)) {
-        printf("#<macro:%p:{", o->data.macro.env);
-        print(o->data.macro.code);
+        printf("#<macro:%p:{", o->data.closure.env);
+        print(o->data.closure.code);
         printf("}>");
     } else if (is_cons(o)) {
         printf("(");

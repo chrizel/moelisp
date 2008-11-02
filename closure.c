@@ -15,9 +15,9 @@ pobject closure_new(pobject env, pobject params, pobject code)
     return o;
 }
 
-pobject closure_eval(pobject call_env, pobject closure, pobject params)
+pobject closure_eval(pobject call_env, pobject closure, pobject params, int eval_params)
 {
-    pobject symbol, values;
+    pobject symbol, values, value;
     pobject params_symbols = cons_car( closure->data.closure.code );
     pobject code = cons_cdr( closure->data.closure.code );
     pobject env  = gc_add( cons_new( symbol_parent_env, 
@@ -33,14 +33,20 @@ pobject closure_eval(pobject call_env, pobject closure, pobject params)
                                             symbol_length(symbol) - 3);
             values = NIL;
             while (params) {
-                cons_list_append(&values, eval( call_env, cons_car( params ) ), 1);
+		value = eval_params
+		    ? eval( call_env, cons_car( params ) )
+		    : cons_car( params );
+                cons_list_append(&values, value, 1);
                 params = cons_cdr(params);
             }
             env = gc_add( cons_new( symbol, gc_add( cons_new( values, env ) ) ) );
             break;
         } else {
+	    value = eval_params
+		? eval( call_env, cons_car( params ) )
+		: cons_car( params );
             env = gc_add( cons_new( symbol,
-                      gc_add( cons_new( eval( call_env, cons_car( params ) ), env ) ) ) );
+                      gc_add( cons_new( value, env ) ) ) );
             params_symbols = cons_cdr(params_symbols);
             params = cons_cdr(params);
         }

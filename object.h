@@ -30,10 +30,6 @@ struct object {
             pobject env;
             pobject code;
         } closure;
-        struct {
-            pobject env;
-            pobject code;
-        } macro;
     } data;
 };
 

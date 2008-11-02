@@ -135,7 +135,7 @@ static pobject apply(pobject env, pobject params)
 {
     /* XXX: apply needs more work */
     return eval_apply(env, eval(env, cons_car(params)), 
-                      eval(env, cons_nth(params, 2)));
+                      eval(env, cons_nth(params, 2)), 0);
 }
 
 static pobject car(pobject env, pobject params)

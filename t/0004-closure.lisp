@@ -53,3 +53,8 @@
 (test  12  (= (acc-c (quote get)) 19))
 (test  13  (= (acc-b (quote get)) 107))
 
+;; test apply
+(test  14  (= (apply (lambda (x) x) (list 42)) 42))
+(test  15  (= (apply (lambda (x) x) (list (quote a))) (quote a)))
+(test  16  (= (apply (lambda (x) x) (list (quote a)))
+	      ((lambda (x) x) (quote a))))

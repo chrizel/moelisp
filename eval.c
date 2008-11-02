@@ -10,22 +10,15 @@
 #include "print.h"
 #include "symbol.h"
 
-pobject eval_apply(pobject env, pobject proc, pobject params)
+pobject eval_apply(pobject env, pobject proc, pobject params, int eval_params)
 {
     if (!(is_nil(params) || is_cons(params)))
         params = gc_add( cons_new(params, NIL) );
 
-    /*
-    printf("* ");
-    print(proc);
-    printf(": ");
-    println(params);
-    */
-
     if (is_cfunc(proc))
         return proc->data.cfunc(env, params);
     else if (is_closure(proc))
-        return closure_eval(env, proc, params);
+        return closure_eval(env, proc, params, eval_params);
     else if (is_macro(proc))
         return macro_eval(env, proc, params);
     else
@@ -35,7 +28,7 @@ pobject eval_apply(pobject env, pobject proc, pobject params)
 pobject eval(pobject env, pobject code)
 {
     if (is_cons(code))
-        return eval_apply(env, eval(env, cons_car(code)), cons_cdr(code));
+        return eval_apply(env, eval(env, cons_car(code)), cons_cdr(code), 1);
     else if (is_symbol(code))
         return cons_car(env_lookup(env, code));
     else
