@@ -65,6 +65,7 @@ static void init()
     object_free_count   = 0;
     object_true         = symbol_intern("#t");
     symbol_parent_env   = symbol_intern("__parent_env__");
+    symbol_quote        = symbol_intern("quote");
 
     builtin_core_init(&global_env);
     builtin_math_init(&global_env);

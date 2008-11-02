@@ -14,6 +14,7 @@
 #define TK_SYMBOL        3
 #define TK_NUMBER        4
 #define TK_DOT           5
+#define TK_QUOTE         6
 
 static inline int is_symbol_char(int c)
 {
@@ -56,6 +57,8 @@ static int next_token(char *code, int *start, int *end)
         return TK_PAREN_CLOSE;
     else if (c == '.')
         return TK_DOT;
+    else if (c == '\'')
+        return TK_QUOTE;
     else if (c >= '0' && c <= '9') {
         while (code[*end] && ((code[*end] >= '0' && code[*end] <= '9') || (code[*end] == '.')))
             ++(*end);
@@ -69,42 +72,60 @@ static int next_token(char *code, int *start, int *end)
     }
 }
 
-#define moe_read_stack_macro(stack, object) { \
-    pobject tmp = (object); \
-    if (is_nil(stack)) \
-        return tmp; \
-    else if (dot_next) { \
-        cons_list_last_cdr_set( &(stack->data.cons.car), tmp); \
-        dot_next = 0; \
-    } else { \
-        cons_list_append( &(stack->data.cons.car), tmp, 1 ); \
-    } \
+static pobject next_object(char *code, int *start, int *end, int *state)
+{
+    static const int STATE_EOL   = 1 << 1;
+    static const int STATE_DOT   = 1 << 2;
+    static const int STATE_QUOTE = 1 << 3;
+
+    pobject result = NIL;
+
+    switch (next_token(code, start, end)) {
+    case TK_SYMBOL:
+        result = symbol_intern_by_slice(code, *start, *end);
+        break;
+    case TK_NUMBER:
+        result = gc_add( number_new_by_slice(code, *start, *end) );
+        break;
+    case TK_DOT:
+        *state |= STATE_DOT;
+        result = next_object(code, start, end, state);
+        break;
+    case TK_QUOTE:
+        *state |= STATE_QUOTE;
+        result = next_object(code, start, end, state);
+        break;
+    case TK_PAREN_OPEN:
+        for (;;) {
+            int entry_state = 0;
+            pobject entry = next_object(code, start, end, &entry_state);
+            if (entry_state & STATE_EOL) {
+                break;
+            } else if (entry_state & STATE_DOT) {
+                cons_list_last_cdr_set(&result, entry);
+                break;
+            } else {
+                cons_list_append(&result, entry, 1);
+            }
+        }
+        break;
+    case TK_PAREN_CLOSE:
+    case TK_EOF:
+        *state |= STATE_EOL;
+        break;
+    }
+
+    if (*state & STATE_QUOTE) {
+        result = gc_add( cons_new( symbol_quote,
+                    gc_add( cons_new( result, NIL ))));
+        *state = *state & ~STATE_QUOTE;
+    }
+
+    return result;
 }
 
 pobject moe_read(char *code)
 {
-    int type, start, end = 0, dot_next = 0;
-    pobject stack = NIL;
-
-    while ((type = next_token(code, &start, &end))) {
-        switch (type) {
-        case TK_SYMBOL:
-            moe_read_stack_macro(stack, symbol_intern_by_slice(code, start, end));
-            break;
-        case TK_NUMBER:
-            moe_read_stack_macro(stack, gc_add( number_new_by_slice(code, start, end) ));
-            break;
-        case TK_PAREN_OPEN:
-            cons_stack_push(&stack, NIL, 1);
-            break;
-        case TK_PAREN_CLOSE:
-            moe_read_stack_macro(stack, cons_stack_pop(&stack));
-            break;
-        case TK_DOT:
-            dot_next = 1;
-            break;
-        }
-    }; 
-
-    return is_nil(stack) ? NIL : cons_car(cons_list_last(stack));
+    int start = 0, end = 0, state = 0;
+    return next_object(code, &start, &end, &state);
 }
