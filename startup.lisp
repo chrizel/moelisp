@@ -28,6 +28,17 @@
             (cons (map car defs) body))
      (cons (quote list) (map second defs))))
 
+(defmacro (let* defs body...)
+  (define (let*-iter defs)
+    (if defs
+	(let ((def (car defs)))
+	  (list (quote apply)
+		(list (quote lambda) (list (car def))
+		      (let*-iter (cdr defs)))
+		(cons (quote list) (cdr def))))
+      (cons (quote begin) body)))
+  (let*-iter defs))
+
 ;;
 ;; list operations
 ;;
