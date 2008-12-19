@@ -1,11 +1,12 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <unistd.h>
 
 #include "cfunc.h"
 #include "cons.h"
+#include "error.h"
 #include "eval.h"
 #include "gc.h"
 #include "number.h"
@@ -75,6 +76,11 @@ static void cleanup()
 {
     gc_collect(NIL);
     symbol_cleanup();
+
+    if ((object_new_count - object_free_count) > 0) {
+        moe_warning("%d leaked objects detected after cleanup.", 
+            object_new_count - object_free_count);
+    }
 }
 
 static void cleanup_signal_handler(int sig)
