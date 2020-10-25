@@ -7,6 +7,13 @@
 #include "object.h"
 #include "symbol.h"
 
+int object_new_count;
+int object_free_count;
+
+pobject object_true;
+pobject symbol_parent_env;
+pobject symbol_quote;
+
 pobject object_new(char type)
 {
     pobject o = malloc(sizeof(struct object));

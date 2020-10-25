@@ -42,12 +42,12 @@ struct object {
 #define T_CLOSURE   0x06
 #define T_MACRO     0x07
 
-int object_new_count;
-int object_free_count;
+extern int object_new_count;
+extern int object_free_count;
 
-pobject object_true;
-pobject symbol_parent_env;
-pobject symbol_quote;
+extern pobject object_true;
+extern pobject symbol_parent_env;
+extern pobject symbol_quote;
 
 static inline int object_type(pobject o)
     { return o ? (o->flags & 0x0f) : NIL; }
