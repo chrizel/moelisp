@@ -11,7 +11,7 @@
 
 static pobject plus(pobject env, pobject params)
 {
-    float result = 0;
+    double result = 0;
     while (is_cons(params)) {
         pobject o = eval(env, cons_car(params));
         if (is_number(o))
@@ -24,7 +24,7 @@ static pobject plus(pobject env, pobject params)
 
 static pobject minus(pobject env, pobject params)
 {
-    float result = 0;
+    double result = 0;
     pobject o = eval(env, cons_car(params)); 
     if (is_number(o)) {
         result = number_value(o);
@@ -46,7 +46,7 @@ static pobject minus(pobject env, pobject params)
 
 static pobject mult(pobject env, pobject params)
 {
-    float result = 1;
+    double result = 1;
     while (is_cons(params)) {
         pobject o = eval(env, cons_car(params));
         if (is_number(o))
@@ -59,7 +59,7 @@ static pobject mult(pobject env, pobject params)
 
 static pobject div(pobject env, pobject params)
 {
-    float result = 0;
+    double result = 0;
     pobject o = eval(env, cons_car(params)); 
     if (is_number(o)) {
         result = number_value(o);
