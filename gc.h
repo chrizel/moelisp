@@ -1,5 +1,5 @@
 #ifndef GC_H
-#define GC_h
+#define GC_H
 
 #include "object.h"
 
